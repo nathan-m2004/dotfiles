@@ -1,0 +1,17 @@
+[general]
+import = ['~/.cache/wal/colors-alacritty.toml']
+
+[window]
+
+opacity = 0.8
+blur = false
+
+[font]
+
+normal = { family = "RobotoMonoNerdFont" }
+
+
+[[keyboard.bindings]]
+key = "F"
+mods = "Control|Alt"
+command = { program = "bash", args = ["-c", "alacritty --working-directory . &"] } 

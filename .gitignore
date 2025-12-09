@@ -1,0 +1,6 @@
+.DS_Store
+*.log
+.bash_history
+.zsh_history
+ssh/
+install_log.txt

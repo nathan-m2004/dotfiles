@@ -1,0 +1,99 @@
+@import '../../.cache/wal/colors-waybar.css';
+
+* {
+    border: none;
+    border-radius: 0;
+    min-height: 0;
+    font-family: "RobotoMonoNerdFont";
+    font-size: 14px;
+}
+
+window#waybar {
+    background: rgba(0,0,0,0);
+    color: white;
+}
+
+window#waybar > * {
+    margin-top: 10px;
+}
+
+#window	{
+	background-color: rgba(0,0,0,0.2);
+	border: 0px solid;
+	border-radius: 50px;
+	min-width: 150px;
+    padding: 0 20px;
+}
+
+tooltip {
+    background-color: rgba(0,0,0, 0.8);
+    border: 1px solid white;
+    border-radius: 5px;
+}
+
+#workspaces {
+    background-color: rgba(0,0,0, 0.5);
+    border: 0px solid white;
+    border-radius: 50px;
+    padding: 0 10px;
+}
+
+#workspaces button {
+    all: initial;
+    min-width: 0;
+    color: white;
+    padding: 0 10px;
+
+}
+
+#keyboard-state label	{
+    padding: 0 10px;
+}
+
+#clock {
+    background-color: rgba(0,0,0, 0.5);
+    border: 0px solid white;
+    border-radius: 50px;
+    color: white;
+    padding: 0 10px;
+}
+
+#tray {
+    background-color: rgba(0,0,0, 0.5);
+    border: 0px solid white;
+    border-radius: 50px;
+    min-width: 40px;
+    padding: 0 10px;
+}
+
+#tray * {
+    padding: 0 5px;
+}
+
+#custom-power  {
+    background-color: rgba(0,0,0, 0.5);
+    border: 0px solid white;
+    border-radius: 50px;
+    color: white;
+    padding: 0 10px;
+    padding-right: 12px;
+    min-width: 20px;
+}
+
+#cpu,
+#memory,
+#custom-hyprsunset  {
+    background-color: rgba(0,0,0, 0.4);
+    border: 0px solid white;
+    border-radius: 50px;
+    color: white;
+    min-width: 60px;
+    padding: 0 10px;
+}
+
+#cpu.critical,
+#memory.critical {
+    background-color: #ddc7a1;
+    border: 1px solid white;
+    color: #c14a4a;
+}

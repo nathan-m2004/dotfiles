@@ -1,0 +1,5 @@
+@import "../../.cache/wal/colors-rofi-dark.rasi"
+
+configuration {
+	font: "RobotoMonoNerdFont 12";
+}
