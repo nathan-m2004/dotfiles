@@ -1,99 +1,33 @@
-@import '../../.cache/wal/colors-waybar.css';
+@import "../../.cache/wal/colors-waybar.css";
 
 * {
-    border: none;
-    border-radius: 0;
-    min-height: 0;
     font-family: "RobotoMonoNerdFont";
     font-size: 14px;
+    padding: 0.1rem 0.5rem;
+    background: none;
 }
 
-window#waybar {
-    background: rgba(0,0,0,0);
-    color: white;
+#waybar {
+    background-color: rgba(0, 0, 0, 0.35);
 }
 
-window#waybar > * {
-    margin-top: 10px;
-}
-
-#window	{
-	background-color: rgba(0,0,0,0.2);
-	border: 0px solid;
-	border-radius: 50px;
-	min-width: 150px;
-    padding: 0 20px;
-}
-
-tooltip {
-    background-color: rgba(0,0,0, 0.8);
-    border: 1px solid white;
-    border-radius: 5px;
-}
-
-#workspaces {
-    background-color: rgba(0,0,0, 0.5);
-    border: 0px solid white;
-    border-radius: 50px;
-    padding: 0 10px;
-}
-
+/* Base style for all workspace buttons (Inactive) */
 #workspaces button {
-    all: initial;
-    min-width: 0;
-    color: white;
-    padding: 0 10px;
-
+    color: #888888; /* Grey/Dim text */
 }
 
-#keyboard-state label	{
-    padding: 0 10px;
+/* Style for the ACTIVE workspace button */
+#workspaces button.active {
+    color: #ffffff; /* Bright White */
+    font-weight: bold; /* Optional: Make it bold */
 }
 
-#clock {
-    background-color: rgba(0,0,0, 0.5);
-    border: 0px solid white;
-    border-radius: 50px;
-    color: white;
-    padding: 0 10px;
+/* Style for URGENT workspaces (e.g., notification in that workspace) */
+#workspaces button.urgent {
+    color: #ff0000; /* Red */
 }
 
-#tray {
-    background-color: rgba(0,0,0, 0.5);
-    border: 0px solid white;
-    border-radius: 50px;
-    min-width: 40px;
-    padding: 0 10px;
-}
-
-#tray * {
-    padding: 0 5px;
-}
-
-#custom-power  {
-    background-color: rgba(0,0,0, 0.5);
-    border: 0px solid white;
-    border-radius: 50px;
-    color: white;
-    padding: 0 10px;
-    padding-right: 12px;
-    min-width: 20px;
-}
-
-#cpu,
-#memory,
-#custom-hyprsunset  {
-    background-color: rgba(0,0,0, 0.4);
-    border: 0px solid white;
-    border-radius: 50px;
-    color: white;
-    min-width: 60px;
-    padding: 0 10px;
-}
-
-#cpu.critical,
-#memory.critical {
-    background-color: #ddc7a1;
-    border: 1px solid white;
-    color: #c14a4a;
+#workspaces button:hover {
+    border: none;
+    color: #66aacc;
 }
