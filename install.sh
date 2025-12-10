@@ -7,41 +7,74 @@ DOTFILES_DIR="$HOME/dotfiles"
 # 1. Official Arch Packages
 # Added: wtype (for emojis), pacman-contrib (for checkupdates), alacritty, rofi
 PKGS=(
+    # --- Core & Window Manager ---
     "stow"
     "git"
     "hyprland"
+    "hypridle"
+    "hyprlock"
+    "hyprshot"
+    "xdg-desktop-portal-hyprland"
+    "hyprpolkitagent"
+    
+    # --- Terminal & Shell ---
     "alacritty"
     "zsh"
-    "dolphin"
+    "fastfetch"
+    
+    # --- Theming ---
+    "nwg-look"
+    
+    # --- Bar, Launcher, Notifications ---
     "waybar"
     "rofi"
     "rofi-emoji"
     "wtype"
     "swaync"
-    "hyprpaper"
-    "hyprsunset"
+    "libnotify"
+    
+    # --- File Manager (Thunar) ---
+    "thunar"
+    "thunar-archive-plugin" # Right-click -> Extract
+    "thunar-volman"         # Auto-mount USBs
+    "tumbler"               # Image thumbnails
+    "ffmpegthumbnailer"     # Video thumbnails
+    "gvfs"                  # Trash & Mounting
+    "file-roller"           # The actual archive tool
+    
+    # --- Tools ---
+    "gsimplecal"
+    "wl-clipboard"
+    "pacman-contrib"
+    "grim"
+    "slurp"
+    
+    # --- Audio & Network ---
     "pipewire"
     "pipewire-pulse"
     "wireplumber"
-    "xdg-desktop-portal-hyprland"
-    "polkit-kde-agent"
-    "hyprpolkitagent"
-    "qt5-wayland"
-    "qt6-wayland"
+    "network-manager-applet"
+    "blueman"
+    
+    # --- Fonts ---
     "ttf-jetbrains-mono-nerd"
     "ttf-roboto-mono-nerd"
     "noto-fonts-emoji"
     "noto-fonts" 
     "noto-fonts-cjk"
     "ttf-font-awesome"
-    "fastfetch"
-    "gsimplecal"
 )
 
 # 2. AUR Packages
 AUR_PKGS=(
     "visual-studio-code-bin" 
     "python-pywal16"
+    "pwvucontrol"
+    "python-pywalfox"
+    "waypaper"
+    "swww"
+    "hyprsunset"
+    "spicetify-cli"
 )
 
 # --- Functions ---
@@ -107,10 +140,38 @@ stow_dotfiles() {
     warn "Stow complete. If existing config files were 'adopted', you will see them as modified in git status."
 }
 
+install_firefox_userjs() {
+    log "Configuring Firefox user.js..."
+
+    # 1. Source file in your dotfiles
+    # Make sure you actually saved your user.js here!
+    SOURCE_FILE="$HOME/dotfiles/firefox/user.js"
+
+    if [ ! -f "$SOURCE_FILE" ]; then
+        warn "File not found: $SOURCE_FILE"
+        warn "Skipping Firefox config."
+        return
+    fi
+
+    # 2. Find the active profile (randomized string ending in .default-release)
+    PROFILE_DIR=$(find "$HOME/.mozilla/firefox" -maxdepth 1 -type d -name "*.default-release" | head -n 1)
+
+    if [ -z "$PROFILE_DIR" ]; then
+        warn "Firefox profile not found. Run Firefox once to generate it."
+        return
+    fi
+
+    # 3. Create the symlink
+    # This overwrites any existing user.js with your managed one
+    ln -sf "$SOURCE_FILE" "$PROFILE_DIR/user.js"
+    
+    log "Linked user.js to: $PROFILE_DIR"
+}
+
 finalize() {
     log "Making scripts executable..."
     chmod +x "$HOME/.config/waybar/scripts/"*.sh 2>/dev/null
-    chmod +x "$HOME/dotfiles/scripts/"*.sh 2>/dev/null
+    chmod +x "$HOME/.config/waypaper/"*.sh 2>/dev/null
 }
 
 # --- Main Execution ---
@@ -130,7 +191,10 @@ install_packages
 # 4. Link Configs (Safe Mode)
 stow_dotfiles
 
-# 5. Final Permissions
+# 5. Install Firefox user.js
+install_firefox_userjs
+
+# 6. Final Permissions
 finalize
 
 log "Installation Complete! Please restart your shell or reboot."

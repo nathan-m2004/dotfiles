@@ -1,0 +1,75 @@
+/* Import Pywal colors (adjust path if needed) */
+@import "../../.cache/wal/colors-waybar.css";
+
+* {
+    border: none;
+    border-radius: none;
+}
+
+/* --- Main Window --- */
+.control-center {
+    background: rgba(0, 0, 0, 0.5);
+    color: @foreground;
+}
+
+/* --- The Header (Inbox | Clear) --- */
+.widget-title {
+    color: @color1;
+}
+
+.widget-title > button {
+    background: transparent;
+    color: @color8;
+    border: none;
+    box-shadow: none;
+    font-weight: bold;
+}
+
+.widget-title > button:hover {
+    color: @color9; /* Red-ish on hover */
+    background: transparent;
+}
+
+/* --- Do Not Disturb Toggle --- */
+.widget-dnd {
+    background: transparent;
+    color: @foreground;
+}
+
+.widget-dnd > switch {
+    background: @color0;
+}
+
+.widget-dnd > switch:checked {
+    background: @color1; /* Accent color when active */
+}
+
+/* --- Notification Cards --- */
+.notification-row {
+    outline: none;
+}
+
+.notification {
+    background: @color0; /* Slightly lighter than bg */
+    box-shadow: none;
+}
+
+/* Remove weird default highlighting */
+.notification:hover {
+    background: @color0;
+}
+
+/* Notification Content */
+.summary {
+    color: @color1;
+    font-weight: bold;
+}
+
+.body {
+    color: @foreground;
+}
+
+.time {
+    color: @color8;
+    font-size: 0.8rem;
+}

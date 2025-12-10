@@ -4,21 +4,29 @@
     font-family: "RobotoMonoNerdFont";
     font-size: 14px;
     padding: 0.1rem 0.5rem;
-    background: none;
 }
 
 #waybar {
-    background-color: rgba(0, 0, 0, 0.35);
+    border-bottom: 1px solid alpha(@background, 0.15);
+    background-color: alpha(@background, 0.35);
+}
+
+tooltip {
+    background-color: alpha(@background, 0.65);
 }
 
 /* Base style for all workspace buttons (Inactive) */
 #workspaces button {
-    color: #888888; /* Grey/Dim text */
+    color: @color15; /* Grey/Dim text */
+}
+
+#workspaces button:hover {
+    background-color: alpha(@background, 0.45);
 }
 
 /* Style for the ACTIVE workspace button */
 #workspaces button.active {
-    color: #ffffff; /* Bright White */
+    color: @color17; /* Bright White */
     font-weight: bold; /* Optional: Make it bold */
 }
 
@@ -29,5 +37,5 @@
 
 #workspaces button:hover {
     border: none;
-    color: #66aacc;
+    color: @color14;
 }

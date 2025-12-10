@@ -2,6 +2,7 @@
 {
     "reload_style_on_change": true,
     "spacing": 15,
+    "layer": "top",
     // Choose the order of the modules
     "modules-left": ["hyprland/workspaces"],
     "modules-center": ["hyprland/window"],
@@ -15,43 +16,8 @@
     ],
     "custom/monitor-button": {
         "format": "", // Icon + Text
-        "tooltip": "Toggle Btop",
+        "tooltip": false,
         "on-click": "~/.config/waybar/toggle_monitor.sh"
-    },
-    //      Modules configuration
-    "group/utils-drawer": {
-        "orientation": "horizontal",
-        "modules": [
-            "custom/utils-icon", // The "Handle" (Always visible)
-            "custom/yay-updates",
-            "custom/hyprsunset"
-        ],
-        "drawer": {
-            "transition-duration": 500,
-            "transition-left-to-right": false,
-            "click-to-reveal": true // true = click to open; false = hover to open
-        }
-    },
-    "custom/utils-icon": {
-        "format": "🛠️", // A generic "System" icon (Nerd Font)
-        "tooltip": false
-    },
-    "group/system-drawer": {
-        "orientation": "horizontal",
-        "modules": [
-            "custom/system-icon", // The "Handle" (Always visible)
-            "cpu",
-            "memory"
-        ],
-        "drawer": {
-            "transition-duration": 500,
-            "transition-left-to-right": false,
-            "click-to-reveal": true // true = click to open; false = hover to open
-        }
-    },
-    "custom/system-icon": {
-        "format": "", // A generic "System" icon (Nerd Font)
-        "tooltip": false
     },
     "custom/yay-updates": {
         "exec": "~/.config/waybar/updates.sh",
@@ -60,7 +26,7 @@
         "interval": 3600, // Check every hour (3600s). frequent checks slow down system.
         "tooltip": true,
         // On click: Update, then signal Waybar to refresh the module immediately
-        "on-click": "alacritty -e yay; pkill -SIGRTMIN+8 waybar",
+        "on-click": "alacritty -e yay -Syu --noconfirm; pkill -SIGRTMIN+8 waybar",
         "signal": 8
     },
     "hyprland/workspaces": {

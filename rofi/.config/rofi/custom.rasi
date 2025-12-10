@@ -1,0 +1,15 @@
+@import "../../.cache/wal/colors-rofi-dark.rasi"
+
+* {
+    background-color: @background;
+    text-color:       @foreground;
+
+    margin: 0px;
+    padding: 0px;
+    spacing: 0px;
+}
+
+window {
+    width: 50%;                 /* Width of the window */
+    padding: 20px;
+}

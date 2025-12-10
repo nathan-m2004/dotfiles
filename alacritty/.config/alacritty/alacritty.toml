@@ -2,12 +2,11 @@
 import = ['~/.cache/wal/colors-alacritty.toml']
 
 [window]
-
-opacity = 0.75
+padding = {x = 10, y = 10}
+opacity = 0.35
 blur = false
 
 [font]
-
 normal = { family = "RobotoMonoNerdFont" }
 
 
