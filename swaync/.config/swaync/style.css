@@ -1,75 +1,105 @@
-/* Import Pywal colors (adjust path if needed) */
 @import "../../.cache/wal/colors-waybar.css";
 
+/* --- UNIVERSAL RESET --- */
+/* This kills every default GTK style, border, and shadow */
 * {
-    border: none;
-    border-radius: none;
+    all: unset;
+    font-family: "RobotoMono Nerd Font", monospace;
+    font-size: 12px;
 }
 
-/* --- Main Window --- */
+/* --- BASE LAYOUT REPAIRS --- */
+/* 'unset' breaks layout flow, so we must tell GTK how to stack things again */
+
+/* The Main Window */
 .control-center {
-    background: rgba(0, 0, 0, 0.5);
+    padding: 4rem 2rem;
+    background: alpha(@background, 0.35); /* Dark background so you can see white text */
     color: @foreground;
+    border: 1px solid alpha(@background, 0.15);
 }
 
-/* --- The Header (Inbox | Clear) --- */
-.widget-title {
-    color: @color1;
+/* Vertical Stacking */
+.widget-title,
+.widget-dnd,
+.widget-notifications {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 4rem; /* Space between widgets */
 }
 
-.widget-title > button {
-    background: transparent;
-    color: @color8;
-    border: none;
-    box-shadow: none;
+/* --- VISIBILITY FIXES --- */
+/* Without this, text would be invisible or size 0 */
+
+/* Global Text Color */
+label,
+button {
     font-weight: bold;
 }
 
-.widget-title > button:hover {
-    color: @color9; /* Red-ish on hover */
-    background: transparent;
+/* Buttons (Clear All, DND Toggle) */
+button {
+    border-radius: 12px;
+    color: @background;
+    background: @foreground;
+    padding: 0.5rem;
 }
 
-/* --- Do Not Disturb Toggle --- */
-.widget-dnd {
-    background: transparent;
-    color: @foreground;
-}
-
-.widget-dnd > switch {
-    background: @color0;
-}
-
-.widget-dnd > switch:checked {
-    background: @color1; /* Accent color when active */
-}
-
-/* --- Notification Cards --- */
+/* Notification List Container */
 .notification-row {
-    outline: none;
+    display: flex;
+    margin-bottom: 2rem;
 }
 
+/* Notification Card Content */
 .notification {
-    background: @color0; /* Slightly lighter than bg */
-    box-shadow: none;
+    display: flex;
+    padding: 0.5rem 1.5rem;
+    background-color: alpha(@background, 0.35);
 }
 
-/* Remove weird default highlighting */
-.notification:hover {
-    background: @color0;
+.image {
+    all: revert;
+    min-width: 100%; /* Match the size you set in config.json */
+    min-height: 100%;
+    margin-right: 2rem;
 }
 
-/* Notification Content */
+/* Headers */
 .summary {
-    color: @color1;
     font-weight: bold;
 }
 
 .body {
-    color: @foreground;
+    font-weight: normal;
 }
 
-.time {
-    color: @color8;
-    font-size: 0.8rem;
+/* --- DND Widget Layout --- */
+.widget-dnd {
+    display: flex;
+    flex-direction: row; /* Put label and switch side-by-side */
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* The actual toggle background (The "Track") */
+.widget-dnd > switch {
+    background: @background;
+    border-radius: 12px;
+    min-width: 20px; /* REQUIRED: Give it width */
+    min-height: 20px; /* REQUIRED: Give it height */
+}
+
+/* The toggle background when ON */
+.widget-dnd > switch:checked {
+    background: @color4; /* Green when active */
+}
+
+/* The moving circle (The "Slider") */
+.widget-dnd > switch slider {
+    background: white;
+    min-width: 20px; /* REQUIRED */
+    min-height: 20px; /* REQUIRED */
+    margin: 2px;
+    border-radius: 50%;
 }
