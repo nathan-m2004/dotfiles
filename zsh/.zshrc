@@ -105,5 +105,13 @@ source $ZSH/oh-my-zsh.sh
 
 export TERMINAL="alacritty"
 export FILEMANAGER="thunar"
+export BROWSER=firefox
+
+alias dslr="while true; do
+    echo 'Starting Camera...'
+    gphoto2 --stdout --capture-movie | ffmpeg -i - -vcodec rawvideo -pix_fmt yuv420p -threads 0 -f v4l2 /dev/video10
+    echo 'Camera disconnected. Retrying in 1 second...'
+    sleep 1
+done"
 
 fastfetch

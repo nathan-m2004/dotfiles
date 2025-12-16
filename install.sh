@@ -55,6 +55,7 @@ PKGS=(
     "wireplumber"
     "network-manager-applet"
     "blueman"
+    "easyeffects"
     
     # --- Fonts ---
     "ttf-jetbrains-mono-nerd"

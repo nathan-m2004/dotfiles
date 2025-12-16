@@ -1,5 +1,9 @@
 configuration {
 	font: "RobotoMonoNerdFont 12";
+	disable-history: true;
+	sort: true;
+	sorting-method: "fzf";
+	matching: "fuzzy";
 }
 
 @theme "~/.config/rofi/custom.rasi"
