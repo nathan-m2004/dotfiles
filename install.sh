@@ -98,11 +98,12 @@ PKGS=(
 
 # 2. AUR Packages
 AUR_PKGS=(
-    "bibata-cursor-theme" # Moved from official repos
+    "bibata-cursor-theme" 
     "python-pywal16"
     "pwvucontrol"
     "waypaper"
     "vscodium-bin"
+    "plymouth" # Added Plymouth here
 )
 
 # --- Functions ---
@@ -141,7 +142,6 @@ install_packages() {
 stow_dotfiles() {
     log "Stowing dotfiles..."
 
-    # SAFETY CHECK: Ensure repo is clean before stowing with adopt
     if [[ -n $(git status --porcelain) ]]; then
         error "Your dotfiles repo has uncommitted changes!"
         warn "Please commit or stash your changes before running the stow step."
@@ -209,38 +209,67 @@ enable_services() {
 install_cybergrub() {
     log "Installing CyberGRUB-2077 theme..."
     
-    # 1. Prepare directory and clone
     sudo mkdir -p /boot/grub/themes
     rm -rf /tmp/cybergrub
     git clone https://github.com/adnksharp/CyberGRUB-2077.git /tmp/cybergrub
     
-    # 2. Move theme to correct location
     sudo cp -r /tmp/cybergrub/CyberGRUB-2077 /boot/grub/themes/
     rm -rf /tmp/cybergrub
     
-    # 3. Configure /etc/default/grub
     log "Updating GRUB configuration..."
     
-    # Ensure graphical terminal is active
     sudo sed -i 's/^#GRUB_TERMINAL_OUTPUT="gfxterm"/GRUB_TERMINAL_OUTPUT="gfxterm"/' /etc/default/grub
     
-    # Replace or add the GRUB_THEME line
     if grep -q "^GRUB_THEME=" /etc/default/grub; then
         sudo sed -i 's|^GRUB_THEME=.*|GRUB_THEME="/boot/grub/themes/CyberGRUB-2077/theme.txt"|' /etc/default/grub
     else
         echo 'GRUB_THEME="/boot/grub/themes/CyberGRUB-2077/theme.txt"' | sudo tee -a /etc/default/grub > /dev/null
     fi
     
-    # Set resolution to a standard safe wide resolution if it's currently commented or auto
     if grep -q "^#GRUB_GFXMODE=" /etc/default/grub; then
         sudo sed -i 's/^#GRUB_GFXMODE=.*/GRUB_GFXMODE=1920x1080,auto/' /etc/default/grub
     elif grep -q "^GRUB_GFXMODE=auto" /etc/default/grub; then
         sudo sed -i 's/^GRUB_GFXMODE=auto/GRUB_GFXMODE=1920x1080,auto/' /etc/default/grub
     fi
 
-    # 4. Generate the new GRUB config
     sudo grub-mkconfig -o /boot/grub/grub.cfg
     log "CyberGRUB-2077 installed successfully!"
+}
+
+install_plymouth() {
+    log "Installing Plymouth 'Glitch' theme..."
+
+    # 1. Download and apply the theme
+    rm -rf /tmp/plymouth-themes
+    git clone https://github.com/adi1090x/plymouth-themes.git /tmp/plymouth-themes
+    
+    sudo mkdir -p /usr/share/plymouth/themes
+    sudo cp -r /tmp/plymouth-themes/pack_2/glitch /usr/share/plymouth/themes/
+    rm -rf /tmp/plymouth-themes
+
+    # 2. Add 'plymouth' to mkinitcpio.conf hooks
+    # It safely injects 'plymouth' right after 'udev'
+    if ! grep -q "plymouth" /etc/mkinitcpio.conf; then
+        log "Adding plymouth hook to mkinitcpio.conf..."
+        sudo sed -i 's/\b\(udev\)\b/\1 plymouth/' /etc/mkinitcpio.conf
+    fi
+
+    # 3. Add 'splash' to GRUB kernel parameters for the quiet boot experience
+    if ! grep -q "splash" /etc/default/grub; then
+        log "Adding 'splash' to GRUB parameters..."
+        sudo sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="/GRUB_CMDLINE_LINUX_DEFAULT="splash /' /etc/default/grub
+    fi
+
+    # 4. Set the theme and rebuild the initramfs
+    # The -R flag automatically runs mkinitcpio for you
+    log "Setting Plymouth theme and rebuilding initramfs..."
+    sudo plymouth-set-default-theme -R glitch
+
+    # 5. Re-generate GRUB to apply the splash parameter
+    log "Updating GRUB for Plymouth..."
+    sudo grub-mkconfig -o /boot/grub/grub.cfg
+
+    log "Plymouth setup complete!"
 }
 
 finalize() {
@@ -275,7 +304,10 @@ install_firefox_userjs
 # 7. Install CyberGRUB Theme
 install_cybergrub
 
-# 8. Final Permissions
+# 8. Install Plymouth Theme
+install_plymouth
+
+# 9. Final Permissions
 finalize
 
 log "Installation Complete! Please restart your shell or reboot."
