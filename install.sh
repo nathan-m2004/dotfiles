@@ -4,12 +4,19 @@
 LOG_FILE="install_log.txt"
 DOTFILES_DIR="$HOME/dotfiles"
 
+# Ask for the administrator password upfront
+sudo -v
+
+# Keep-alive: update existing `sudo` time stamp until script has finished
+while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+
 # 1. Official Arch Packages
-# Added: wtype (for emojis), pacman-contrib (for checkupdates), alacritty, rofi
 PKGS=(
     # --- Core & Window Manager ---
     "stow"
     "git"
+    "docker"
+    "firefox"
     "hyprland"
     "hypridle"
     "hyprlock"
@@ -22,32 +29,37 @@ PKGS=(
     "zsh"
     "fastfetch"
     
-    # --- Theming ---
+    # --- Theming & Appearance ---
     "nwg-look"
+    "materia-gtk-theme"
+    "papirus-icon-theme"
+    "swww"
+    "hyprsunset"
     
     # --- Bar, Launcher, Notifications ---
     "waybar"
-    "rofi"
+    "rofi"               
     "rofi-emoji"
-    "wtype"
+    "wtype"              
     "swaync"
     "libnotify"
     
     # --- File Manager (Thunar) ---
     "thunar"
-    "thunar-archive-plugin" # Right-click -> Extract
-    "thunar-volman"         # Auto-mount USBs
-    "tumbler"               # Image thumbnails
-    "ffmpegthumbnailer"     # Video thumbnails
-    "gvfs"                  # Trash & Mounting
-    "file-roller"           # The actual archive tool
+    "thunar-archive-plugin"
+    "thunar-volman"
+    "tumbler"
+    "ffmpegthumbnailer"
+    "gvfs"
+    "file-roller"
     
-    # --- Tools ---
+    # --- Tools & Utilities ---
     "gsimplecal"
     "wl-clipboard"
     "pacman-contrib"
-    "grim"
-    "slurp"
+    "flatpak"
+    "os-prober"
+    "ly"
     
     # --- Audio & Network ---
     "pipewire"
@@ -58,24 +70,39 @@ PKGS=(
     "easyeffects"
     
     # --- Fonts ---
-    "ttf-jetbrains-mono-nerd"
     "ttf-roboto-mono-nerd"
     "noto-fonts-emoji"
-    "noto-fonts" 
+    "noto-fonts"
     "noto-fonts-cjk"
     "ttf-font-awesome"
+
+    # --- Applications & Media ---
+    "libreoffice-still"
+    "obsidian"
+    "krita"
+    "obs-studio"
+    "qbittorrent"
+    "vlc"
+    "vlc-plugins-extra"
+    "vlc-plugin-ffmpeg"
+
+    # --- Virtualization ---
+    "qemu-full"
+    "virt-manager"
+
+    # --- Development & Debugging ---
+    "gdb"
+    "perf"
+    "valgrind"
 )
 
 # 2. AUR Packages
 AUR_PKGS=(
-    "visual-studio-code-bin" 
+    "bibata-cursor-theme" # Moved from official repos
     "python-pywal16"
     "pwvucontrol"
-    "python-pywalfox"
     "waypaper"
-    "swww"
-    "hyprsunset"
-    "spicetify-cli"
+    "vscodium-bin"
 )
 
 # --- Functions ---
@@ -169,6 +196,35 @@ install_firefox_userjs() {
     log "Linked user.js to: $PROFILE_DIR"
 }
 
+enable_services() {
+    log "Enabling systemd services..."
+
+    # Network Manager (Required for network-manager-applet)
+    log "Enabling NetworkManager..."
+    sudo systemctl enable --now NetworkManager
+
+    # Bluetooth (Required for blueman)
+    log "Enabling Bluetooth..."
+    sudo systemctl enable --now bluetooth
+
+    # Virtualization (Required for qemu/virt-manager)
+    log "Enabling libvirtd..."
+    sudo systemctl enable --now libvirtd
+    
+    # Add current user to the libvirt group so you don't need sudo for VMs
+    sudo usermod -aG libvirt "$USER"
+    log "Added $USER to the libvirt group."
+
+    # Display Manager (Ly)
+    # Note: We don't use '--now' here so it doesn't instantly kill your current active session
+    log "Enabling Ly Display Manager..."
+    sudo systemctl enable ly@tty7.service
+    
+    # Optional: If you plan to add Docker back into this script later, uncomment this:
+    log "Enabling Docker..."
+    sudo systemctl enable --now docker
+}
+
 finalize() {
     log "Making scripts executable..."
     chmod +x "$HOME/.config/waybar/scripts/"*.sh 2>/dev/null
@@ -189,13 +245,16 @@ check_yay
 # 3. Install Software
 install_packages
 
-# 4. Link Configs (Safe Mode)
+# 4. Enable Services
+enable_services
+
+# 5. Link Configs (Safe Mode)
 stow_dotfiles
 
-# 5. Install Firefox user.js
+# 6. Install Firefox user.js
 install_firefox_userjs
 
-# 6. Final Permissions
+# 7. Final Permissions
 finalize
 
 log "Installation Complete! Please restart your shell or reboot."
