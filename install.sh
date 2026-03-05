@@ -142,7 +142,6 @@ stow_dotfiles() {
     log "Stowing dotfiles..."
 
     # SAFETY CHECK: Ensure repo is clean before stowing with adopt
-    # This prevents accidental overwrites if you are in the middle of editing
     if [[ -n $(git status --porcelain) ]]; then
         error "Your dotfiles repo has uncommitted changes!"
         warn "Please commit or stash your changes before running the stow step."
@@ -157,22 +156,15 @@ stow_dotfiles() {
         if [[ "$folder" == ".git" ]]; then continue; fi
 
         log "Stowing $folder..."
-        # --adopt: If a file exists on disk (e.g., ~/.config/waybar/config), 
-        # stow will move it INTO your repo and link it back.
-        # This is safe because we checked that git status is clean above.
         stow --adopt -v "$folder"
     done
     
-    # CRITICAL: Do NOT run 'git checkout .' here.
-    # Instead, we just advise the user.
     warn "Stow complete. If existing config files were 'adopted', you will see them as modified in git status."
 }
 
 install_firefox_userjs() {
     log "Configuring Firefox user.js..."
 
-    # 1. Source file in your dotfiles
-    # Make sure you actually saved your user.js here!
     SOURCE_FILE="$HOME/dotfiles/firefox/user.js"
 
     if [ ! -f "$SOURCE_FILE" ]; then
@@ -181,7 +173,6 @@ install_firefox_userjs() {
         return
     fi
 
-    # 2. Find the active profile (randomized string ending in .default-release)
     PROFILE_DIR=$(find "$HOME/.mozilla/firefox" -maxdepth 1 -type d -name "*.default-release" | head -n 1)
 
     if [ -z "$PROFILE_DIR" ]; then
@@ -189,40 +180,67 @@ install_firefox_userjs() {
         return
     fi
 
-    # 3. Create the symlink
-    # This overwrites any existing user.js with your managed one
     ln -sf "$SOURCE_FILE" "$PROFILE_DIR/user.js"
-    
     log "Linked user.js to: $PROFILE_DIR"
 }
 
 enable_services() {
     log "Enabling systemd services..."
 
-    # Network Manager (Required for network-manager-applet)
     log "Enabling NetworkManager..."
     sudo systemctl enable --now NetworkManager
 
-    # Bluetooth (Required for blueman)
     log "Enabling Bluetooth..."
     sudo systemctl enable --now bluetooth
 
-    # Virtualization (Required for qemu/virt-manager)
     log "Enabling libvirtd..."
     sudo systemctl enable --now libvirtd
     
-    # Add current user to the libvirt group so you don't need sudo for VMs
     sudo usermod -aG libvirt "$USER"
     log "Added $USER to the libvirt group."
 
-    # Display Manager (Ly)
-    # Note: We don't use '--now' here so it doesn't instantly kill your current active session
     log "Enabling Ly Display Manager..."
     sudo systemctl enable ly@tty7.service
     
-    # Optional: If you plan to add Docker back into this script later, uncomment this:
     log "Enabling Docker..."
     sudo systemctl enable --now docker
+}
+
+install_cybergrub() {
+    log "Installing CyberGRUB-2077 theme..."
+    
+    # 1. Prepare directory and clone
+    sudo mkdir -p /boot/grub/themes
+    rm -rf /tmp/cybergrub
+    git clone https://github.com/adnksharp/CyberGRUB-2077.git /tmp/cybergrub
+    
+    # 2. Move theme to correct location
+    sudo cp -r /tmp/cybergrub/CyberGRUB-2077 /boot/grub/themes/
+    rm -rf /tmp/cybergrub
+    
+    # 3. Configure /etc/default/grub
+    log "Updating GRUB configuration..."
+    
+    # Ensure graphical terminal is active
+    sudo sed -i 's/^#GRUB_TERMINAL_OUTPUT="gfxterm"/GRUB_TERMINAL_OUTPUT="gfxterm"/' /etc/default/grub
+    
+    # Replace or add the GRUB_THEME line
+    if grep -q "^GRUB_THEME=" /etc/default/grub; then
+        sudo sed -i 's|^GRUB_THEME=.*|GRUB_THEME="/boot/grub/themes/CyberGRUB-2077/theme.txt"|' /etc/default/grub
+    else
+        echo 'GRUB_THEME="/boot/grub/themes/CyberGRUB-2077/theme.txt"' | sudo tee -a /etc/default/grub > /dev/null
+    fi
+    
+    # Set resolution to a standard safe wide resolution if it's currently commented or auto
+    if grep -q "^#GRUB_GFXMODE=" /etc/default/grub; then
+        sudo sed -i 's/^#GRUB_GFXMODE=.*/GRUB_GFXMODE=1920x1080,auto/' /etc/default/grub
+    elif grep -q "^GRUB_GFXMODE=auto" /etc/default/grub; then
+        sudo sed -i 's/^GRUB_GFXMODE=auto/GRUB_GFXMODE=1920x1080,auto/' /etc/default/grub
+    fi
+
+    # 4. Generate the new GRUB config
+    sudo grub-mkconfig -o /boot/grub/grub.cfg
+    log "CyberGRUB-2077 installed successfully!"
 }
 
 finalize() {
@@ -254,7 +272,10 @@ stow_dotfiles
 # 6. Install Firefox user.js
 install_firefox_userjs
 
-# 7. Final Permissions
+# 7. Install CyberGRUB Theme
+install_cybergrub
+
+# 8. Final Permissions
 finalize
 
 log "Installation Complete! Please restart your shell or reboot."
