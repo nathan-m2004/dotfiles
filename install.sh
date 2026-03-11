@@ -173,7 +173,7 @@ install_firefox_userjs() {
         return
     fi
 
-    PROFILE_DIR=$(find "$HOME/.mozilla/firefox" -maxdepth 1 -type d -name "*.default-release" | head -n 1)
+    PROFILE_DIR=$(find "$HOME/.config/mozilla/firefox" -maxdepth 1 -type d -name "*.default-release" | head -n 1)
 
     if [ -z "$PROFILE_DIR" ]; then
         warn "Firefox profile not found. Run Firefox once to generate it."
