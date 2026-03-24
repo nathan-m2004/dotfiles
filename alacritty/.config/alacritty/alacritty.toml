@@ -1,5 +1,6 @@
 [general]
 import = ['~/.cache/wal/colors-alacritty.toml']
+ipc_socket = true
 
 [window]
 padding = {x = 10, y = 10}
@@ -9,8 +10,13 @@ blur = false
 [font]
 normal = { family = "RobotoMonoNerdFont" }
 
-
 [[keyboard.bindings]]
 key = "F"
 mods = "Control|Alt"
-command = { program = "zsh", args = ["-c", "alacritty --working-directory . &"] } 
+command = { program = "zsh", args = ["-c", "alacritty --working-directory . &"] }
+
+[[keyboard.bindings]]
+key = "B"
+mods = "Control|Shift"
+# Toggle: If opacity is 1.0, set to 0.8 + blur. Otherwise, set to 1.0 + no blur.
+command = { program = "sh", args = ["-c", "if [ \"$(alacritty msg get-config window.opacity)\" = \"1.0\" ]; then alacritty msg config \"window.opacity=0.8\" \"window.blur=true\"; else alacritty msg config \"window.opacity=1.0\" \"window.blur=false\"; fi"] }
