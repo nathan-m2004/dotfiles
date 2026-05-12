@@ -140,26 +140,34 @@ install_packages() {
 }
 
 stow_dotfiles() {
-    log "Stowing dotfiles..."
+    log "Stowing dotfiles (including uncommitted changes)..."
 
-    if [[ -n $(git status --porcelain) ]]; then
-        error "Your dotfiles repo has uncommitted changes!"
-        warn "Please commit or stash your changes before running the stow step."
-        warn "Skipping stow to prevent data loss."
+    # Ensure we are in the right directory
+    if [ ! -d "$DOTFILES_DIR" ]; then
+        error "Dotfiles directory not found at $DOTFILES_DIR"
         return
     fi
-    
+
     cd "$DOTFILES_DIR" || exit
-    
+
+    # Loop through each directory in the dotfiles folder
     for folder in */ ; do
         folder=${folder%/}
-        if [[ "$folder" == ".git" ]]; then continue; fi
+        
+        # Skip the .git folder and other hidden metadata folders
+        [[ "$folder" =~ ^\..* ]] && continue
 
-        log "Stowing $folder..."
-        stow --adopt -v "$folder"
+        log "Linking $folder..."
+        
+        # --adopt: Handles conflicts by moving existing config into your repo
+        # -v: Verbose output so you can see what's happening
+        # -t ~: Targets your home directory
+        stow --adopt -v -t "$HOME" "$folder"
     done
-    
-    warn "Stow complete. If existing config files were 'adopted', you will see them as modified in git status."
+
+    # Inform the user that changes might be staged/modified now
+    warn "Stow complete. If system files were newer than your dotfiles, they have been moved into $DOTFILES_DIR."
+    log "Check 'git status' to see what changed."
 }
 
 install_firefox_userjs() {
