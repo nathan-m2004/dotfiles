@@ -2,7 +2,14 @@
 
 # --- Configuration ---
 LOG_FILE="install_log.txt"
-DOTFILES_DIR="$HOME/dotfiles"
+DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Fail-fast and error handling
+set -e
+trap 'echo -e "\033[0;31m[ERROR]\033[0m An error occurred. Exiting..."; exit 1' ERR
+
+# Log output to file and terminal
+exec > >(tee -i "$LOG_FILE") 2>&1
 
 # Ask for the administrator password upfront
 sudo -v
@@ -111,11 +118,71 @@ AUR_PKGS=(
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
 NC='\033[0m'
 
 log() { echo -e "${GREEN}[INFO]${NC} $1"; }
 warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
 error() { echo -e "${RED}[ERROR]${NC} $1"; }
+
+ask() {
+    local prompt="$1"
+    local default="$2"
+    if [ "$AUTO_YES" = true ]; then
+        return 0
+    fi
+    local reply
+    if [ "$default" = "Y" ]; then
+        echo -n -e "${BLUE}[?]${NC} $prompt [Y/n]: "
+        read -r reply
+        [[ -z "$reply" || "$reply" =~ ^[Yy]$ ]] && return 0 || return 1
+    else
+        echo -n -e "${BLUE}[?]${NC} $prompt [y/N]: "
+        read -r reply
+        [[ "$reply" =~ ^[Yy]$ ]] && return 0 || return 1
+    fi
+}
+
+usage() {
+    echo -e "Usage: $0 [OPTIONS]"
+    echo -e "Options:"
+    echo -e "  --help, -h       Show this help message"
+    echo -e "  --stow           Only link dotfiles"
+    echo -e "  --packages       Only install packages and enable services"
+    echo -e "  --themes         Only install themes (CyberGRUB, Plymouth)"
+    echo -e "  --all            Run everything (default if no options provided)"
+    echo -e "  --yes, -y        Skip interactive prompts (auto-yes)"
+    exit 0
+}
+
+# --- Argument Parsing ---
+RUN_ALL=true
+RUN_STOW=false
+RUN_PACKAGES=false
+RUN_THEMES=false
+AUTO_YES=false
+
+if [ $# -gt 0 ]; then
+    RUN_ALL=false
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            --help|-h) usage ;;
+            --stow) RUN_STOW=true ;;
+            --packages) RUN_PACKAGES=true ;;
+            --themes) RUN_THEMES=true ;;
+            --all) RUN_ALL=true ;;
+            --yes|-y) AUTO_YES=true ;;
+            *) error "Unknown option: $1"; usage ;;
+        esac
+        shift
+    done
+fi
+
+if [ "$RUN_ALL" = true ]; then
+    RUN_STOW=true
+    RUN_PACKAGES=true
+    RUN_THEMES=true
+fi
 
 check_yay() {
     if ! command -v yay &> /dev/null; then
@@ -150,6 +217,9 @@ stow_dotfiles() {
 
     cd "$DOTFILES_DIR" || exit
 
+    local BACKUP_DIR="$HOME/.dotfiles.backup_$(date +%Y%m%d_%H%M%S)"
+    local BACKUP_CREATED=false
+
     # Loop through each directory in the dotfiles folder
     for folder in */ ; do
         folder=${folder%/}
@@ -158,6 +228,21 @@ stow_dotfiles() {
         [[ "$folder" =~ ^\..* ]] && continue
 
         log "Linking $folder..."
+        
+        # Identify broken/conflicting symlinks before stowing
+        conflicts=$(stow -n -v -t "$HOME" "$folder" 2>&1 | awk -F ': ' '/existing target is/ {print $2}')
+        for conflict in $conflicts; do
+            if [ -L "$HOME/$conflict" ] || [ -f "$HOME/$conflict" ]; then
+                if [ "$BACKUP_CREATED" = false ]; then
+                    mkdir -p "$BACKUP_DIR"
+                    BACKUP_CREATED=true
+                    log "Created backup directory at $BACKUP_DIR"
+                fi
+                log "Backing up conflicting file: $conflict"
+                mkdir -p "$(dirname "$BACKUP_DIR/$conflict")"
+                mv "$HOME/$conflict" "$BACKUP_DIR/$conflict"
+            fi
+        done
         
         # --adopt: Handles conflicts by moving existing config into your repo
         # -v: Verbose output so you can see what's happening
@@ -173,7 +258,7 @@ stow_dotfiles() {
 install_firefox_userjs() {
     log "Configuring Firefox user.js..."
 
-    SOURCE_FILE="$HOME/dotfiles/firefox/user.js"
+    SOURCE_FILE="$DOTFILES_DIR/firefox/user.js"
 
     if [ ! -f "$SOURCE_FILE" ]; then
         warn "File not found: $SOURCE_FILE"
@@ -290,32 +375,32 @@ finalize() {
 
 log "Starting Installation..."
 
-# 1. Update System
-log "Updating system..."
-sudo pacman -Syu --noconfirm
+if [ "$RUN_PACKAGES" = true ]; then
+    log "Updating system..."
+    sudo pacman -Syu --noconfirm
+    check_yay
+    install_packages
+    enable_services
+fi
 
-# 2. Setup AUR Helper
-check_yay
+if [ "$RUN_STOW" = true ]; then
+    stow_dotfiles
+    install_firefox_userjs
+    finalize
+fi
 
-# 3. Install Software
-install_packages
+if [ "$RUN_THEMES" = true ]; then
+    if ask "Do you want to install the CyberGRUB-2077 theme?" "N"; then
+        install_cybergrub
+    else
+        log "Skipping CyberGRUB theme."
+    fi
 
-# 4. Enable Services
-enable_services
-
-# 5. Link Configs (Safe Mode)
-stow_dotfiles
-
-# 6. Install Firefox user.js
-install_firefox_userjs
-
-# 7. Install CyberGRUB Theme
-install_cybergrub
-
-# 8. Install Plymouth Theme
-install_plymouth
-
-# 9. Final Permissions
-finalize
+    if ask "Do you want to install the Plymouth 'Glitch' theme?" "N"; then
+        install_plymouth
+    else
+        log "Skipping Plymouth theme."
+    fi
+fi
 
 log "Installation Complete! Please restart your shell or reboot."
