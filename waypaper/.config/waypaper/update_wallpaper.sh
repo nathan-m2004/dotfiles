@@ -12,7 +12,7 @@ fi
 # 2. Set Wallpaper with swww
 # -t grow: Grows the new image from the center (looks cool)
 # --transition-fps 60: Smooth animation
-swww img "$path" --transition-type simple --transition-fps 60 --transition-duration 2
+awww img "$path" --transition-type simple --transition-fps 60 --transition-duration 2
 
 # 3. Generate Colors (Pywal)
 # -n: Skip setting wallpaper (swww already did it)
