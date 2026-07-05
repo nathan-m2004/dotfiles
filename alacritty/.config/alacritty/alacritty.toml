@@ -10,6 +10,9 @@ blur = false
 [font]
 normal = { family = "RobotoMonoNerdFont" }
 
+[scrolling]
+history = 100000
+
 [[keyboard.bindings]]
 key = "F"
 mods = "Control|Alt"
