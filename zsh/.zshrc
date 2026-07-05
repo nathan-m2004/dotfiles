@@ -118,6 +118,15 @@ alias dslr="while true; do
     sleep 1
 done"
 
+# Colored system aliases
+alias ll="ls -lah --color=auto"
+alias la="ls -A --color=auto"
+alias l="ls -CF --color=auto"
+alias ls="ls --color=auto"
+alias grep="grep --color=auto"
+alias diff="diff --color=auto"
+alias ip="ip -color"
+
 # SSH terminal compatibility alias
 alias ssh="TERM=xterm-256color ssh"
 
