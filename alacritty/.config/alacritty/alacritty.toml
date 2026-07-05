@@ -18,5 +18,5 @@ command = { program = "zsh", args = ["-c", "alacritty --working-directory . &"] 
 [[keyboard.bindings]]
 key = "O"
 mods = "Control|Shift"
-# Toggle: If opacity is 1.0, set to 0.8 + blur. Otherwise, set to 1.0 + no blur.
-command = { program = "sh", args = ["-c", "if [ \"$(alacritty msg get-config window.opacity)\" = \"1.0\" ]; then alacritty msg config \"window.opacity=0.8\" \"window.blur=true\"; else alacritty msg config \"window.opacity=1.0\" \"window.blur=false\"; fi"] }
+# Toggle: If opacity is 1.0, set to 0.35 + blur. Otherwise, set to 1.0 + no blur.
+command = { program = "sh", args = ["-c", "if [ \"$(alacritty msg get-config | jq -r '.window.opacity')\" = \"1.0\" ]; then alacritty msg config \"window.opacity=0.35\" \"window.blur=true\"; else alacritty msg config \"window.opacity=1.0\" \"window.blur=false\"; fi"] }

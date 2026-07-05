@@ -118,4 +118,18 @@ alias dslr="while true; do
     sleep 1
 done"
 
+# SSH terminal compatibility alias
+alias ssh="TERM=xterm-256color ssh"
+
+# Log colorizer (no dependencies)
+clog() {
+    sed -E '
+    s/\b(INFO)\b/\x1b[32m\1\x1b[0m/g;
+    s/\b(WARN|WARNING)\b/\x1b[33m\1\x1b[0m/g;
+    s/\b(ERROR|FATAL|FAIL)\b/\x1b[31m\1\x1b[0m/g;
+    s/(\[[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}\])/\x1b[36m\1\x1b[0m/g;
+    s/([a-zA-Z0-9_]+=)([0-9a-zA-Z_:-]+)/\1\x1b[35m\2\x1b[0m/g
+    ' "$@"
+}
+
 fastfetch
