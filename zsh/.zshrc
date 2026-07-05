@@ -107,6 +107,10 @@ export TERMINAL="alacritty"
 export FILEMANAGER="thunar"
 export BROWSER=firefox
 
+if command -v prime-run &> /dev/null; then
+    alias firefox="prime-run firefox"
+fi
+
 alias dslr="while true; do
     echo 'Starting Camera...'
     gphoto2 --stdout --capture-movie | ffmpeg -i - -vcodec rawvideo -pix_fmt yuv420p -threads 0 -f v4l2 /dev/video10

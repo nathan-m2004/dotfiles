@@ -4,3 +4,4 @@
 .zsh_history
 ssh/
 install_log.txt
+hypr/.config/hypr/machine.conf

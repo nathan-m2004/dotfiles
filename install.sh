@@ -217,6 +217,19 @@ stow_dotfiles() {
 
     cd "$DOTFILES_DIR" || exit
 
+    # Create a default machine.conf if it doesn't exist
+    if [ ! -f "$DOTFILES_DIR/hypr/.config/hypr/machine.conf" ]; then
+        log "Creating default local machine.conf..."
+        mkdir -p "$DOTFILES_DIR/hypr/.config/hypr"
+        cat <<EOF > "$DOTFILES_DIR/hypr/.config/hypr/machine.conf"
+# Machine-specific configuration
+# Place monitor configurations, workspace mappings, and overrides here.
+
+# Example Monitor (Personal):
+# monitor=DP-1,1920x1080@180,0x0,1
+EOF
+    fi
+
     local BACKUP_DIR="$HOME/.dotfiles.backup_$(date +%Y%m%d_%H%M%S)"
     local BACKUP_CREATED=false
 
