@@ -1,10 +1,13 @@
 [general]
-import = ['~/.cache/wal/colors-alacritty.toml']
+import = [
+    '~/.cache/wal/colors-alacritty.toml',
+    '~/.config/alacritty/opacity.toml',
+    '~/.config/alacritty/local.toml'
+]
 ipc_socket = true
 
 [window]
 padding = {x = 10, y = 10}
-opacity = 0.35
 blur = false
 
 [font]

@@ -5,3 +5,5 @@
 ssh/
 install_log.txt
 hypr/.config/hypr/machine.conf
+hypr/.config/hypr/xdph.conf
+alacritty/.config/alacritty/local.toml
