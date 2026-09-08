@@ -18,10 +18,9 @@ awww img "$path" --transition-type simple --transition-fps 60 --transition-durat
 # -n: Skip setting wallpaper (swww already did it)
 wal -i "$path" -n
 
-# 3. Update Firefox
-pywalfox update
-
-spicetify apply -n
+# 3. Update Firefox & Spotify (if installed)
+command -v pywalfox &>/dev/null && pywalfox update
+command -v spicetify &>/dev/null && spicetify apply -n
 
 # 4. Reload UI Apps
 swaync-client -rs

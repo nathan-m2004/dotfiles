@@ -30,11 +30,11 @@ hl.env("HYPRCURSOR_SIZE", "24")
 
 -- Autostart
 hl.on("hyprland.start", function()
-    hl.exec_cmd("waybar & awww-daemon & swaync & hyprsunset & nm-applet --indicator")
-    hl.exec_cmd("sleep 1 && waypaper --restore")
     hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")
     hl.exec_cmd("systemctl --user start hyprpolkitagent")
     hl.exec_cmd("hyprctl setcursor Bibata-Modern-Classic 24")
+    hl.exec_cmd("waybar & awww-daemon & swaync & hyprsunset & nm-applet --indicator")
+    hl.exec_cmd("sleep 1 && waypaper --restore")
     hl.exec_cmd(config_dir .. "/scripts/battery-notify.sh")
     hl.exec_cmd("flatpak run com.discordapp.Discord")
     hl.exec_cmd("firefox")
