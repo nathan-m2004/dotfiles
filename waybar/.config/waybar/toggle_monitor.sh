@@ -12,5 +12,7 @@ if hyprctl clients | grep -q "class: $CLASS"; then
 else
     # If it doesn't exist, launch it using Alacritty
     # --class sets the Wayland app_id so Hyprland can grab it
-    alacritty --class $CLASS -e btop &
+    MONITOR_CMD="btop"
+    command -v btop &>/dev/null || MONITOR_CMD="htop"
+    alacritty --class "$CLASS" -e "$MONITOR_CMD" &
 fi

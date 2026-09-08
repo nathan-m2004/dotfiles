@@ -142,3 +142,5 @@ clog() {
 }
 
 fastfetch
+
+. "$HOME/.local/bin/env"
