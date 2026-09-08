@@ -27,7 +27,9 @@ PKGS=(
     "hyprland"
     "hypridle"
     "hyprlock"
-    "hyprshot"
+    "grim"
+    "slurp"
+    "satty"
     "xdg-desktop-portal-hyprland"
     "hyprpolkitagent"
     
@@ -40,7 +42,7 @@ PKGS=(
     "nwg-look"
     "materia-gtk-theme"
     "papirus-icon-theme"
-    "swww"
+    "awww"
     "hyprsunset"
     
     # --- Bar, Launcher, Notifications ---
@@ -67,6 +69,8 @@ PKGS=(
     "flatpak"
     "os-prober"
     "ly"
+    "jq"
+    "btop"
     
     # --- Audio & Network ---
     "pipewire"
@@ -107,6 +111,8 @@ PKGS=(
 AUR_PKGS=(
     "bibata-cursor-theme" 
     "python-pywal16"
+    "python-pywalfox"
+    "spicetify-cli"
     "pwvucontrol"
     "waypaper"
     "vscodium-bin"
@@ -217,16 +223,16 @@ stow_dotfiles() {
 
     cd "$DOTFILES_DIR" || exit
 
-    # Create a default machine.conf if it doesn't exist
-    if [ ! -f "$DOTFILES_DIR/hypr/.config/hypr/machine.conf" ]; then
-        log "Creating default local machine.conf..."
+    # Create a default machine.lua if it doesn't exist
+    if [ ! -f "$DOTFILES_DIR/hypr/.config/hypr/machine.lua" ]; then
+        log "Creating default local machine.lua..."
         mkdir -p "$DOTFILES_DIR/hypr/.config/hypr"
-        cat <<EOF > "$DOTFILES_DIR/hypr/.config/hypr/machine.conf"
-# Machine-specific configuration
-# Place monitor configurations, workspace mappings, and overrides here.
+        cat <<EOF > "$DOTFILES_DIR/hypr/.config/hypr/machine.lua"
+-- Machine-specific configuration
+-- Place monitor configurations, workspace mappings, and overrides here.
 
-# Example Monitor (Personal):
-# monitor=DP-1,1920x1080@180,0x0,1
+-- Example Monitor (Personal):
+-- hl.monitor({ output = "DP-1", mode = "1920x1080@180", position = "0x0", scale = 1 })
 EOF
     fi
 
@@ -380,8 +386,9 @@ install_plymouth() {
 
 finalize() {
     log "Making scripts executable..."
-    chmod +x "$HOME/.config/waybar/scripts/"*.sh 2>/dev/null
+    chmod +x "$HOME/.config/waybar/"*.sh 2>/dev/null
     chmod +x "$HOME/.config/waypaper/"*.sh 2>/dev/null
+    chmod +x "$HOME/.config/hypr/scripts/"*.sh 2>/dev/null
 }
 
 # --- Main Execution ---
