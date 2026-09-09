@@ -2,6 +2,33 @@ local home = os.getenv("HOME") or ""
 local config_dir = (os.getenv("XDG_CONFIG_HOME") or (home .. "/.config")) .. "/hypr"
 package.path = config_dir .. "/?.lua;" .. config_dir .. "/?/init.lua;" .. package.path
 
+-- Compatibility wrapper for external tools (e.g. Waybar IPC) sending legacy dispatcher strings
+local original_dispatch = hl.dispatch
+hl.dispatch = function(first, second, ...)
+    if type(first) == "string" then
+        if first == "workspace" and second then
+            local ws = tonumber(second) or second
+            return original_dispatch(hl.dsp.focus({ workspace = ws }))
+        elseif first == "togglespecialworkspace" then
+            local sp = second
+            if sp and sp:match("^special:(.+)") then
+                sp = sp:match("^special:(.+)")
+            end
+            return original_dispatch(hl.dsp.workspace.toggle_special(sp or "magic"))
+        elseif (first == "movetoworkspace" or first == "movetoworkspacesilent") and second then
+            local ws = tonumber(second) or second
+            return original_dispatch(hl.dsp.window.move({ workspace = ws, silent = (first == "movetoworkspacesilent") }))
+        elseif first == "exec" and second then
+            return original_dispatch(hl.dsp.exec_cmd(second))
+        elseif first == "killactive" then
+            return original_dispatch(hl.dsp.window.close())
+        elseif first == "togglefloating" then
+            return original_dispatch(hl.dsp.window.float({ action = "toggle" }))
+        end
+    end
+    return original_dispatch(first, second, ...)
+end
+
 -- Load Wal colors
 local function load_wal_colors()
     local colors = {}

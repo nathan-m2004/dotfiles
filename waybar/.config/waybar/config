@@ -4,7 +4,7 @@
     "spacing": 15,
     "layer": "top",
     // Choose the order of the modules
-    "modules-left": ["hyprland/workspaces"],
+    "modules-left": ["ext/workspaces"],
     "modules-center": ["hyprland/window"],
     "modules-right": [
         "custom/yay-updates", // Start of Pill 1
@@ -29,11 +29,10 @@
         "on-click": "alacritty -e yay -Syu --noconfirm; pkill -SIGRTMIN+8 waybar",
         "signal": 8
     },
-    "hyprland/workspaces": {
-        "disable-scroll": true,
-        "all-outputs": true,
-        "warp-on-scroll": false,
-        "format": "{name}" // Just the number/name
+    "ext/workspaces": {
+        "format": "{name}",
+        "on-click": "activate",
+        "sort-by-id": true
     },
     "custom/hyprsunset": {
         "exec": "~/.config/waybar/hyprsunset.sh",

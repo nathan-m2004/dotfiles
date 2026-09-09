@@ -25,7 +25,8 @@ tooltip {
 }
 
 /* Style for the ACTIVE workspace button */
-#workspaces button.active {
+#workspaces button.active,
+#workspaces button.focused {
     color: @color17; /* Bright White */
     font-weight: bold; /* Optional: Make it bold */
 }
