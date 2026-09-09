@@ -25,6 +25,11 @@ hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd('grim -g "$(slurp)" - | satty
 hl.bind(mainMod .. " + T", hl.dsp.exec_cmd("waypaper"))
 hl.bind(mainMod .. " + comma", hl.dsp.exec_cmd("rofi -modi emoji -show emoji"))
 
+-- Trap Alt+Tab (anti coworker curiosity)
+local noAltTab = home .. "/.config/hypr/scripts/no-alttab.sh"
+hl.bind("ALT + Tab", hl.dsp.exec_cmd(noAltTab))
+hl.bind("ALT + SHIFT + Tab", hl.dsp.exec_cmd(noAltTab))
+
 -- Move focus with mainMod + arrow keys
 hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))
 hl.bind(mainMod .. " + right", hl.dsp.focus({ direction = "right" }))
