@@ -11,12 +11,6 @@ trap 'echo -e "\033[0;31m[ERROR]\033[0m An error occurred. Exiting..."; exit 1' 
 # Log output to file and terminal
 exec > >(tee -i "$LOG_FILE") 2>&1
 
-# Ask for the administrator password upfront
-sudo -v
-
-# Keep-alive: update existing `sudo` time stamp until script has finished
-while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
-
 # 1. Official Arch Packages
 PKGS=(
     # --- Core & Window Manager ---
@@ -35,6 +29,7 @@ PKGS=(
     
     # --- Terminal & Shell ---
     "alacritty"
+    "tmux"
     "zsh"
     "fastfetch"
     
@@ -392,6 +387,13 @@ finalize() {
 }
 
 # --- Main Execution ---
+
+if [ "$RUN_PACKAGES" = true ] || [ "$RUN_THEMES" = true ]; then
+    # Ask for administrator password upfront
+    sudo -v
+    # Keep-alive: update existing sudo timestamp until script finishes
+    while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+fi
 
 log "Starting Installation..."
 
