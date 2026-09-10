@@ -36,19 +36,69 @@ hl.bind(mainMod .. " + right", hl.dsp.focus({ direction = "right" }))
 hl.bind(mainMod .. " + up",    hl.dsp.focus({ direction = "up" }))
 hl.bind(mainMod .. " + down",  hl.dsp.focus({ direction = "down" }))
 
--- Switch workspaces with mainMod + [0-9]
--- Move active window to a workspace with mainMod + SHIFT + [0-9]
-for i = 1, 10 do
-    local key = i % 10
-    hl.bind(mainMod .. " + " .. key, hl.dsp.focus({ workspace = i }))
-    hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i }))
+-- Special workspaces state & multi-scratchpad (Super + S)
+local last_special = "s1"
+
+local function is_multi_special(sp)
+    if not sp then return false end
+    return sp.name:match("^special:s%d+$") ~= nil or sp.name == "special:magic"
 end
 
--- Special workspaces (scratchpad)
-hl.bind(mainMod .. " + S", hl.dsp.workspace.toggle_special("magic"))
+-- Super + S: Toggle special workspace (remembers last visited slot)
+hl.bind(mainMod .. " + S", function()
+    local sp = hl.get_active_special_workspace()
+    if is_multi_special(sp) then
+        local name = sp.name:gsub("^special:", "")
+        last_special = name
+        hl.dispatch(hl.dsp.workspace.toggle_special(name))
+    elseif sp then
+        local name = sp.name:gsub("^special:", "")
+        hl.dispatch(hl.dsp.workspace.toggle_special(name))
+        hl.dispatch(hl.dsp.workspace.toggle_special(last_special))
+    else
+        hl.dispatch(hl.dsp.workspace.toggle_special(last_special))
+    end
+end)
+
+-- Workspaces & Dynamic Special Workspace Slots (Super + [0-9])
+for i = 1, 10 do
+    local key = i % 10
+
+    -- Super + [0-9]: Switch workspace (or switch special slot if already in special workspace)
+    hl.bind(mainMod .. " + " .. key, function()
+        local sp = hl.get_active_special_workspace()
+        if is_multi_special(sp) then
+            local target = "s" .. i
+            last_special = target
+            hl.dispatch(hl.dsp.focus({ workspace = "special:" .. target }))
+        else
+            hl.dispatch(hl.dsp.focus({ workspace = i }))
+        end
+    end)
+
+    -- Super + SHIFT + [0-9]: Move window to workspace (or between special slots if in special)
+    hl.bind(mainMod .. " + SHIFT + " .. key, function()
+        local sp = hl.get_active_special_workspace()
+        if is_multi_special(sp) then
+            hl.dispatch(hl.dsp.window.move({ workspace = "special:s" .. i }))
+        else
+            hl.dispatch(hl.dsp.window.move({ workspace = i }))
+        end
+    end)
+
+    -- Super + CTRL + SHIFT + [0-9]: Send window directly to special slot special:s[i]
+    hl.bind(mainMod .. " + CTRL + SHIFT + " .. key, hl.dsp.window.move({ workspace = "special:s" .. i }))
+
+    -- Super + CTRL + [0-9]: Send window from special workspace back to regular workspace [i]
+    hl.bind(mainMod .. " + CTRL + " .. key, hl.dsp.window.move({ workspace = i }))
+end
+
+-- Dedicated & extra scratchpads
+hl.bind(mainMod .. " + CTRL + SHIFT + S", function()
+    hl.dispatch(hl.dsp.window.move({ workspace = "special:" .. last_special }))
+end)
 hl.bind(mainMod .. " + P", hl.dsp.workspace.toggle_special("spotify"))
 hl.bind(mainMod .. " + I", hl.dsp.workspace.toggle_special("satty"))
-hl.bind(mainMod .. " + CTRL + SHIFT + S", hl.dsp.window.move({ workspace = "special:magic" }))
 hl.bind(mainMod .. " + CTRL + SHIFT + P", hl.dsp.window.move({ workspace = "special:spotify" }))
 hl.bind(mainMod .. " + CTRL + SHIFT + I", hl.dsp.window.move({ workspace = "special:satty" }))
 

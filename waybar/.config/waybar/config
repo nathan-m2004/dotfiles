@@ -4,7 +4,7 @@
     "spacing": 15,
     "layer": "top",
     // Choose the order of the modules
-    "modules-left": ["ext/workspaces"],
+    "modules-left": ["ext/workspaces", "custom/special-workspace"],
     "modules-center": ["hyprland/window"],
     "modules-right": [
         "custom/yay-updates", // Start of Pill 1
@@ -14,6 +14,13 @@
         "tray",
         "custom/power"
     ],
+    "custom/special-workspace": {
+        "exec": "~/.config/waybar/special_workspace.py",
+        "return-type": "json",
+        "format": "{}",
+        "on-click": "~/.config/waybar/toggle_special.sh",
+        "tooltip": true
+    },
     "custom/monitor-button": {
         "format": "", // Icon + Text
         "tooltip": false,

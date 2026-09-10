@@ -40,3 +40,26 @@ tooltip {
     border: none;
     color: @color14;
 }
+
+/* Special Workspace Indicator */
+#custom-special-workspace {
+    color: @color6;
+    background-color: alpha(@color1, 0.45);
+    border: 1px solid alpha(@color6, 0.35);
+    border-radius: 4px;
+    font-weight: bold;
+    margin-left: 6px;
+    margin-right: 4px;
+}
+
+#custom-special-workspace:hover {
+    background-color: alpha(@color6, 0.25);
+    color: @color7;
+}
+
+#custom-special-workspace.empty {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
